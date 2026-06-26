@@ -110,11 +110,24 @@ jobs:
                   gradlePluginPortal()
               }
           }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
           rootProject.name = "GoClaw"
           include ':app'
           SETEOF
 
           cat > build.gradle << 'PROJEOF'
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
           plugins {
               id 'com.android.application' version '8.2.0' apply false
           }
@@ -128,6 +141,10 @@ jobs:
           cat > app/build.gradle << 'APPEOF'
           plugins {
               id 'com.android.application'
+          }
+          repositories {
+              google()
+              mavenCentral()
           }
           android {
               compileSdk 34
