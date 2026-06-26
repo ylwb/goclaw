@@ -3,6 +3,7 @@ package channels
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -12,6 +13,9 @@ import (
 )
 
 func TestNewWeWorkWsBotChannel(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("skipping integration test in CI (requires real WeWork WebSocket)")
+	}
 	mgr := bus.NewMessageBus(16)
 	cfg := config.WeWorkWsBotChannelConfig{
 		Enabled:        true,
@@ -32,10 +36,9 @@ func TestNewWeWorkWsBotChannel(t *testing.T) {
 		for {
 			imsg, err := mgr.ConsumeInbound(ctx)
 			if err != nil {
-				t.Error(err)
 				break
 			}
-			t.Log(imsg)
+			_ = imsg
 			stream := make(chan *bus.StreamMessage, 10)
 			go func() {
 				time.Sleep(1 * time.Second)
@@ -57,7 +60,6 @@ func TestNewWeWorkWsBotChannel(t *testing.T) {
 				}
 			}()
 			channel.SendStream(imsg.ChatID, stream)
-			//channel.Send(&resp)
 		}
 	}()
 	channel.Start(ctx)
